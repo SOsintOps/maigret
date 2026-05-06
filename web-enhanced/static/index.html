@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maigret Enhanced</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-title">Maigret Enhanced <span>OSINT Username Scanner</span></div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-sm btn-outline" id="btnNewScan" style="display:none;" onclick="showSearch()">+ New Scan</button>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="progress-container" id="progressContainer">
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+    <div class="progress-stats">
+      <span id="progressText">Checking 0 / 0 sites</span>
+      <span class="found" id="progressFound">0 found</span>
+      <span class="checking" id="progressSite"></span>
+    </div>
+  </div>
+
+  <!-- Target tabs -->
+  <div class="target-bar" id="targetBar"></div>
+
+  <!-- Search panel -->
+  <div class="search-panel" id="searchPanel">
+    <h2>Username Search</h2>
+    <p class="subtitle">Scan hundreds of sites for matching profiles</p>
+
+    <div class="form-group">
+      <label>Username(s)</label>
+      <input class="form-input" id="inputUsername" type="text"
+             placeholder="johndoe  (comma-separated for multiple)">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Top sites</label>
+        <input class="form-input" id="inputTopSites" type="number" value="500" min="10" max="3000">
+      </div>
+      <div class="form-group">
+        <label>Timeout (s)</label>
+        <input class="form-input" id="inputTimeout" type="number" value="30" min="5" max="120">
+      </div>
+    </div>
+
+    <div class="advanced-toggle" onclick="toggleAdvanced()">&#9662; Advanced options</div>
+    <div class="advanced-body" id="advancedBody">
+      <div class="checkbox-row">
+        <input type="checkbox" id="chkRecursive">
+        <label for="chkRecursive">Recursive parsing (extract linked accounts)</label>
+      </div>
+      <div class="form-group">
+        <label>Include tags</label>
+        <div class="tag-cloud" id="tagCloudInclude"></div>
+      </div>
+      <div class="form-group">
+        <label>Exclude tags</label>
+        <div class="tag-cloud" id="tagCloudExclude"></div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" id="btnScan" onclick="startScan()">Scan</button>
+  </div>
+
+  <!-- Results container (per target) -->
+  <div class="results-container" id="resultsContainer">
+
+    <!-- Summary cards -->
+    <div class="summary-row" id="summaryRow">
+      <div class="summary-card"><div class="label">Sites Checked</div><div class="value accent" id="sumChecked">0</div></div>
+      <div class="summary-card"><div class="label">Profiles Found</div><div class="value green" id="sumFound">0</div></div>
+      <div class="summary-card"><div class="label">Categories</div><div class="value blue" id="sumCategories">0</div></div>
+      <div class="summary-card"><div class="label">Elapsed</div><div class="value orange" id="sumElapsed">0s</div></div>
+    </div>
+
+    <!-- Result tabs -->
+    <div class="result-tabs" id="resultTabs">
+      <div class="result-tab active" data-tab="found" onclick="switchTab(this)">Found <span class="badge" id="badgeFound">0</span></div>
+      <div class="result-tab" data-tab="graph" onclick="switchTab(this)">Graph</div>
+      <div class="result-tab" data-tab="tags" onclick="switchTab(this)">Tags</div>
+      <div class="result-tab" data-tab="export" onclick="switchTab(this)">Export</div>
+      <div class="result-tab" data-tab="raw" onclick="switchTab(this)">Raw JSON</div>
+      <div class="result-tab" data-tab="notes" onclick="switchTab(this)">Notes</div>
+    </div>
+
+    <!-- Tab: Found profiles -->
+    <div class="tab-panel active" id="panel-found">
+      <div class="profiles-toolbar">
+        <input class="filter-input" id="filterInput" placeholder="Filter sites..." oninput="filterProfiles()">
+        <div style="display:flex;gap:6px;">
+          <button class="btn btn-sm btn-outline" onclick="sortProfiles('site')">A-Z</button>
+          <button class="btn btn-sm btn-outline" onclick="sortProfiles('time')">Speed</button>
+          <button class="btn btn-sm btn-outline" onclick="showStarred()">&#9733; Starred</button>
+        </div>
+      </div>
+      <table class="profiles-table">
+        <thead>
+          <tr>
+            <th style="width:30px"></th>
+            <th onclick="sortProfiles('site')">Site</th>
+            <th>URL</th>
+            <th>Tags</th>
+            <th onclick="sortProfiles('time')">Response</th>
+          </tr>
+        </thead>
+        <tbody id="profilesBody"></tbody>
+      </table>
+    </div>
+
+    <!-- Tab: Graph -->
+    <div class="tab-panel" id="panel-graph">
+      <div class="graph-container" id="graphContainer">
+        <div class="graph-controls">
+          <button class="graph-btn" onclick="graphZoom(1.3)" title="Zoom in">+</button>
+          <button class="graph-btn" onclick="graphZoom(0.7)" title="Zoom out">&minus;</button>
+          <button class="graph-btn" onclick="graphReset()" title="Reset">&#8634;</button>
+          <button class="graph-btn" onclick="toggleFullscreen()" title="Fullscreen">&#9974;</button>
+        </div>
+        <svg id="graphSvg" width="100%" height="100%"></svg>
+      </div>
+    </div>
+
+    <!-- Tab: Tags heatmap -->
+    <div class="tab-panel" id="panel-tags">
+      <div class="tags-grid" id="tagsGrid"></div>
+    </div>
+
+    <!-- Tab: Export -->
+    <div class="tab-panel" id="panel-export">
+      <div class="export-grid" id="exportGrid">
+        <div class="export-card" onclick="exportReport('csv')">
+          <div class="format">CSV</div><div class="desc">Spreadsheet-ready table</div>
+        </div>
+        <div class="export-card" onclick="exportReport('json')">
+          <div class="format">JSON</div><div class="desc">Machine-readable data</div>
+        </div>
+        <div class="export-card" onclick="exportReport('txt')">
+          <div class="format">TXT</div><div class="desc">Plain text report</div>
+        </div>
+        <div class="export-card" onclick="exportReport('pdf')">
+          <div class="format">PDF</div><div class="desc">Printable document</div>
+        </div>
+        <div class="export-card" onclick="exportReport('html')">
+          <div class="format">HTML</div><div class="desc">Standalone web report</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Raw JSON -->
+    <div class="tab-panel" id="panel-raw">
+      <pre class="raw-json" id="rawJson">No data yet.</pre>
+    </div>
+
+    <!-- Tab: Notes -->
+    <div class="tab-panel" id="panel-notes">
+      <textarea class="notes-area" id="notesArea" placeholder="Add investigation notes here..."></textarea>
+    </div>
+
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

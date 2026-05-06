@@ -223,6 +223,26 @@ maigret --web 5000
 
 Open http://127.0.0.1:5000, enter a username, and view results.
 
+### Web Enhanced (work in progress)
+
+This fork includes `web-enhanced/`, a ground-up rebuild of the web interface using FastAPI, server-sent events for real-time progress, and a modern single-page frontend. It replaces the original Flask/Jinja UI with:
+
+- FastAPI + SSE for live scan progress streaming
+- D3.js force-directed graph of discovered accounts
+- Tag-based site filtering
+- Multi-format export (CSV, JSON, TXT, PDF, HTML)
+- Profile table with sort and filter
+
+The original web UI (`maigret/web/`) remains untouched. `web-enhanced/` is a separate, standalone application that imports maigret as a library.
+
+```bash
+cd web-enhanced
+pip install -r requirements.txt
+python -m uvicorn server:app --host 127.0.0.1 --port 5001
+```
+
+Status: active development. Not yet integrated into the `--web` flag.
+
 ### Python library
 
 **Maigret can be embedded in your own Python projects.** The CLI is a thin wrapper around an async function you can call directly — build custom pipelines, feed results into your own tooling, or run it inside a larger OSINT workflow.

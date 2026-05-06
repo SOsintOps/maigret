@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Maigret Enhanced — Mockup</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <style>
+    /* inline override: load style.css via relative path too */
+    @import url('style.css');
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="header-title">Maigret Enhanced <span>OSINT Username Scanner</span></div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn btn-sm btn-outline" onclick="showSearch()">+ New Scan</button>
+    </div>
+  </div>
+
+  <!-- Progress bar (complete) -->
+  <div class="progress-container active">
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" style="width:100%"></div>
+    </div>
+    <div class="progress-stats">
+      <span>Checked 500 / 500 sites</span>
+      <span class="found">24 found</span>
+      <span class="checking">Done</span>
+    </div>
+  </div>
+
+  <!-- Target tabs -->
+  <div class="target-bar active">
+    <div class="target-tab active" onclick="selectTarget(this)">johndoe <span class="count">24</span></div>
+    <div class="target-tab" onclick="selectTarget(this)">jane_smith <span class="count">11</span></div>
+    <div class="target-tab" onclick="selectTarget(this)">h4cker99 <span class="count">7</span></div>
+  </div>
+
+  <!-- Results -->
+  <div class="results-container active">
+
+    <!-- Summary cards -->
+    <div class="main">
+      <div class="summary-row">
+        <div class="summary-card"><div class="label">Sites Checked</div><div class="value accent">500</div></div>
+        <div class="summary-card"><div class="label">Profiles Found</div><div class="value green">24</div></div>
+        <div class="summary-card"><div class="label">Categories</div><div class="value blue">12</div></div>
+        <div class="summary-card"><div class="label">Elapsed</div><div class="value orange">4.2s</div></div>
+      </div>
+
+      <!-- Result tabs -->
+      <div class="result-tabs">
+        <div class="result-tab active" data-tab="found" onclick="switchTab(this)">Found <span class="badge">24</span></div>
+        <div class="result-tab" data-tab="graph" onclick="switchTab(this)">Graph</div>
+        <div class="result-tab" data-tab="tags" onclick="switchTab(this)">Tags</div>
+        <div class="result-tab" data-tab="export" onclick="switchTab(this)">Export</div>
+        <div class="result-tab" data-tab="raw" onclick="switchTab(this)">Raw JSON</div>
+        <div class="result-tab" data-tab="notes" onclick="switchTab(this)">Notes</div>
+      </div>
+
+      <!-- Tab: Found -->
+      <div class="tab-panel active" id="panel-found">
+        <div class="profiles-toolbar">
+          <input class="filter-input" placeholder="Filter sites..." oninput="filterMock(this.value)">
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-sm btn-outline">A-Z</button>
+            <button class="btn btn-sm btn-outline">Speed</button>
+            <button class="btn btn-sm btn-outline" onclick="document.querySelectorAll('.star-btn.starred').forEach(b=>{b.classList.toggle('show')})">★ Starred</button>
+          </div>
+        </div>
+        <table class="profiles-table">
+          <thead>
+            <tr>
+              <th style="width:30px"></th>
+              <th>Site</th>
+              <th>URL</th>
+              <th>Tags</th>
+              <th>Response</th>
+            </tr>
+          </thead>
+          <tbody id="profilesBody"></tbody>
+        </table>
+      </div>
+
+      <!-- Tab: Graph -->
+      <div class="tab-panel" id="panel-graph">
+        <div class="graph-container" id="graphContainer">
+          <div class="graph-controls">
+            <button class="graph-btn" onclick="gZoom(1.3)">+</button>
+            <button class="graph-btn" onclick="gZoom(0.7)">&minus;</button>
+            <button class="graph-btn" onclick="gReset()">&#8634;</button>
+            <button class="graph-btn" onclick="toggleFS()">&#9974;</button>
+          </div>
+          <svg id="graphSvg" width="100%" height="100%"></svg>
+        </div>
+      </div>
+
+      <!-- Tab: Tags -->
+      <div class="tab-panel" id="panel-tags">
+        <div class="tags-grid" id="tagsGrid"></div>
+      </div>
+
+      <!-- Tab: Export -->
+      <div class="tab-panel" id="panel-export">
+        <div class="export-grid">
+          <div class="export-card"><div class="format">CSV</div><div class="desc">Spreadsheet-ready table</div></div>
+          <div class="export-card"><div class="format">JSON</div><div class="desc">Machine-readable data</div></div>
+          <div class="export-card"><div class="format">TXT</div><div class="desc">Plain text report</div></div>
+          <div class="export-card"><div class="format">PDF</div><div class="desc">Printable document</div></div>
+          <div class="export-card"><div class="format">HTML</div><div class="desc">Standalone web report</div></div>
+        </div>
+      </div>
+
+      <!-- Tab: Raw JSON -->
+      <div class="tab-panel" id="panel-raw">
+        <pre class="raw-json" id="rawJson"></pre>
+      </div>
+
+      <!-- Tab: Notes -->
+      <div class="tab-panel" id="panel-notes">
+        <textarea class="notes-area" placeholder="Add investigation notes here...">Target: johndoe
+Date: 2026-04-30
+
+Key findings:
+- Active on 24 platforms
+- Consistent username across social media
+- GitHub profile links to personal blog
+- Reddit account active since 2019
+- Possible alt account found via Telegram bio</textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Search panel (hidden initially) -->
+  <div class="search-panel" id="searchPanel" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:500;">
+    <h2>Username Search</h2>
+    <p class="subtitle">Scan hundreds of sites for matching profiles</p>
+    <div class="form-group">
+      <label>Username(s)</label>
+      <input class="form-input" type="text" placeholder="johndoe, janedoe" value="johndoe, jane_smith, h4cker99">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Top sites</label>
+        <input class="form-input" type="number" value="500">
+      </div>
+      <div class="form-group">
+        <label>Timeout (s)</label>
+        <input class="form-input" type="number" value="30">
+      </div>
+    </div>
+    <div class="advanced-toggle" onclick="document.getElementById('advBody').classList.toggle('open')">▾ Advanced options</div>
+    <div class="advanced-body" id="advBody">
+      <div class="checkbox-row">
+        <input type="checkbox" id="chkR"><label for="chkR">Recursive parsing (extract linked accounts)</label>
+      </div>
+      <div class="form-group">
+        <label>Include tags</label>
+        <div class="tag-cloud">
+          <span class="tag-chip included">social (285)</span>
+          <span class="tag-chip">coding (142)</span>
+          <span class="tag-chip included">forum (98)</span>
+          <span class="tag-chip">gaming (76)</span>
+          <span class="tag-chip">dating (54)</span>
+          <span class="tag-chip">music (45)</span>
+          <span class="tag-chip">photo (38)</span>
+          <span class="tag-chip">blog (32)</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Exclude tags</label>
+        <div class="tag-cloud">
+          <span class="tag-chip">social (285)</span>
+          <span class="tag-chip">coding (142)</span>
+          <span class="tag-chip">forum (98)</span>
+          <span class="tag-chip">gaming (76)</span>
+          <span class="tag-chip excluded">dating (54)</span>
+          <span class="tag-chip">music (45)</span>
+          <span class="tag-chip excluded">xx (12)</span>
+          <span class="tag-chip">blog (32)</span>
+        </div>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="document.getElementById('searchPanel').style.display='none'">Scan</button>
+  </div>
+
+<script>
+/* ── Fake data ── */
+const PROFILES = [
+  { site: "GitHub", url: "https://github.com/johndoe", tags: ["coding","git"], time: 0.31, starred: true },
+  { site: "Twitter / X", url: "https://x.com/johndoe", tags: ["social"], time: 0.45, starred: true },
+  { site: "Instagram", url: "https://instagram.com/johndoe", tags: ["social","photo"], time: 0.82, starred: false },
+  { site: "Reddit", url: "https://reddit.com/u/johndoe", tags: ["forum"], time: 0.55, starred: true },
+  { site: "Telegram", url: "https://t.me/johndoe", tags: ["messaging"], time: 1.24, starred: false },
+  { site: "YouTube", url: "https://youtube.com/@johndoe", tags: ["video"], time: 0.91, starred: false },
+  { site: "LinkedIn", url: "https://linkedin.com/in/johndoe", tags: ["professional"], time: 0.67, starred: true },
+  { site: "Steam", url: "https://steamcommunity.com/id/johndoe", tags: ["gaming"], time: 0.38, starred: false },
+  { site: "Spotify", url: "https://open.spotify.com/user/johndoe", tags: ["music"], time: 1.05, starred: false },
+  { site: "Medium", url: "https://medium.com/@johndoe", tags: ["blog"], time: 0.72, starred: false },
+  { site: "Keybase", url: "https://keybase.io/johndoe", tags: ["security","crypto"], time: 0.44, starred: false },
+  { site: "GitLab", url: "https://gitlab.com/johndoe", tags: ["coding","git"], time: 0.59, starred: false },
+  { site: "Pinterest", url: "https://pinterest.com/johndoe", tags: ["social","photo"], time: 0.93, starred: false },
+  { site: "TikTok", url: "https://tiktok.com/@johndoe", tags: ["social","video"], time: 0.77, starred: false },
+  { site: "Twitch", url: "https://twitch.tv/johndoe", tags: ["gaming","video"], time: 0.41, starred: false },
+  { site: "SoundCloud", url: "https://soundcloud.com/johndoe", tags: ["music"], time: 1.33, starred: false },
+  { site: "HackerNews", url: "https://news.ycombinator.com/user?id=johndoe", tags: ["forum","coding"], time: 0.28, starred: true },
+  { site: "DeviantArt", url: "https://deviantart.com/johndoe", tags: ["art"], time: 1.51, starred: false },
+  { site: "Flickr", url: "https://flickr.com/people/johndoe", tags: ["photo"], time: 1.12, starred: false },
+  { site: "Mastodon", url: "https://mastodon.social/@johndoe", tags: ["social"], time: 0.66, starred: false },
+  { site: "StackOverflow", url: "https://stackoverflow.com/users/123456/johndoe", tags: ["coding","forum"], time: 0.35, starred: true },
+  { site: "Gravatar", url: "https://gravatar.com/johndoe", tags: ["social"], time: 0.22, starred: false },
+  { site: "Patreon", url: "https://patreon.com/johndoe", tags: ["crowdfunding"], time: 0.88, starred: false },
+  { site: "Disqus", url: "https://disqus.com/by/johndoe", tags: ["forum"], time: 0.95, starred: false },
+];
+
+/* ── Render profiles ── */
+function renderProfiles(list) {
+  const body = document.getElementById('profilesBody');
+  body.innerHTML = list.map(p => {
+    const tc = p.time < 0.5 ? 'fast' : p.time > 1.0 ? 'slow' : '';
+    const tags = p.tags.map(t => `<span class="profile-tag">${t}</span>`).join('');
+    return `<tr>
+      <td><button class="star-btn ${p.starred?'starred':''}" onclick="this.classList.toggle('starred')">${p.starred?'★':'☆'}</button></td>
+      <td>${p.site}</td>
+      <td><a href="${p.url}" target="_blank">${p.url}</a></td>
+      <td><div class="profile-tags">${tags}</div></td>
+      <td><span class="response-time ${tc}">${p.time}s</span></td>
+    </tr>`;
+  }).join('');
+}
+
+function filterMock(val) {
+  const v = val.toLowerCase();
+  const filtered = PROFILES.filter(p => p.site.toLowerCase().includes(v) || p.url.toLowerCase().includes(v));
+  renderProfiles(filtered);
+}
+
+renderProfiles(PROFILES);
+
+/* ── Raw JSON ── */
+document.getElementById('rawJson').textContent = JSON.stringify({
+  status: "done",
+  username: "johndoe",
+  total_checked: 500,
+  total_found: 24,
+  elapsed_seconds: 4.2,
+  profiles: PROFILES.map(p => ({ site: p.site, url: p.url, tags: p.tags, response_time: p.time }))
+}, null, 2);
+
+/* ── Tags heatmap ── */
+(function() {
+  const counts = {};
+  PROFILES.forEach(p => p.tags.forEach(t => counts[t] = (counts[t]||0)+1));
+  const sorted = Object.entries(counts).sort((a,b) => b[1]-a[1]);
+  const max = sorted[0][1];
+  document.getElementById('tagsGrid').innerHTML = sorted.map(([tag, count]) => {
+    const pct = Math.round((count/max)*100);
+    return `<div class="tag-card">
+      <div class="tag-name">${tag}</div>
+      <div class="tag-count">${count}</div>
+      <div class="tag-bar"><div class="tag-bar-fill" style="width:${pct}%"></div></div>
+    </div>`;
+  }).join('');
+})();
+
+/* ── Tab switching ── */
+function switchTab(el) {
+  document.querySelectorAll('.result-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('panel-' + el.dataset.tab).classList.add('active');
+  if (el.dataset.tab === 'graph') renderGraph();
+}
+
+/* ── Target tabs ── */
+function selectTarget(el) {
+  document.querySelectorAll('.target-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ── Search panel ── */
+function showSearch() {
+  document.getElementById('searchPanel').style.display = 'block';
+}
+
+/* ── D3 Graph ── */
+let zoomB, gG;
+function renderGraph() {
+  const container = document.getElementById('graphContainer');
+  const svg = d3.select('#graphSvg');
+  svg.selectAll('*').remove();
+  const w = container.clientWidth, h = container.clientHeight;
+
+  zoomB = d3.zoom().scaleExtent([0.1,8]).on('zoom', e => gG.attr('transform', e.transform));
+  svg.call(zoomB);
+  gG = svg.append('g');
+
+  const nodes = [
+    { id: "johndoe", size: 25, group: 1, color: "#7c3aed" },
+    ...PROFILES.map(p => ({ id: p.site, size: 12, group: 2, color: "#22c55e", url: p.url })),
+    { id: "id: 12345678", size: 8, group: 3, color: "#f59e0b" },
+    { id: "email: jdoe@mail.com", size: 8, group: 3, color: "#f59e0b" },
+    { id: "fullname: John Doe", size: 8, group: 3, color: "#f59e0b" },
+    { id: "bio: Developer & OSS", size: 8, group: 3, color: "#f59e0b" },
+    { id: "location: Berlin", size: 8, group: 3, color: "#f59e0b" },
+  ];
+  const links = [
+    ...PROFILES.map(p => ({ source: "johndoe", target: p.site, weight: 2 })),
+    { source: "GitHub", target: "id: 12345678", weight: 1 },
+    { source: "GitHub", target: "email: jdoe@mail.com", weight: 1 },
+    { source: "LinkedIn", target: "fullname: John Doe", weight: 1 },
+    { source: "Twitter / X", target: "bio: Developer & OSS", weight: 1 },
+    { source: "Mastodon", target: "location: Berlin", weight: 1 },
+    { source: "GitLab", target: "email: jdoe@mail.com", weight: 1 },
+  ];
+
+  const sim = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links).id(d => d.id).distance(90))
+    .force('charge', d3.forceManyBody().strength(-180))
+    .force('center', d3.forceCenter(w/2, h/2))
+    .force('collision', d3.forceCollide().radius(d => (d.size||10)+4));
+
+  const link = gG.append('g').selectAll('line').data(links).join('line')
+    .attr('stroke','#3a3a4a').attr('stroke-width', d => d.weight||1);
+
+  const node = gG.append('g').selectAll('circle').data(nodes).join('circle')
+    .attr('r', d => d.size||8).attr('fill', d => d.color||'#7c3aed')
+    .attr('stroke','#1a1a24').attr('stroke-width',1.5)
+    .call(d3.drag()
+      .on('start',(e,d)=>{if(!e.active)sim.alphaTarget(0.3).restart();d.fx=d.x;d.fy=d.y;})
+      .on('drag',(e,d)=>{d.fx=e.x;d.fy=e.y;})
+      .on('end',(e,d)=>{if(!e.active)sim.alphaTarget(0);d.fx=null;d.fy=null;})
+    );
+
+  const label = gG.append('g').selectAll('text').data(nodes).join('text')
+    .text(d => d.id).attr('font-size', d => d.group===1?13:10)
+    .attr('fill','#8888a0').attr('dx', d => (d.size||8)+4).attr('dy',4);
+
+  node.on('click',(e,d)=>{if(d.url)window.open(d.url,'_blank');});
+  node.style('cursor', d => d.url ? 'pointer' : 'default');
+
+  sim.on('tick',()=>{
+    link.attr('x1',d=>d.source.x).attr('y1',d=>d.source.y)
+        .attr('x2',d=>d.target.x).attr('y2',d=>d.target.y);
+    node.attr('cx',d=>d.x).attr('cy',d=>d.y);
+    label.attr('x',d=>d.x).attr('y',d=>d.y);
+  });
+}
+
+function gZoom(f) { d3.select('#graphSvg').transition().duration(300).call(zoomB.scaleBy, f); }
+function gReset() { d3.select('#graphSvg').transition().duration(500).call(zoomB.transform, d3.zoomIdentity); }
+function toggleFS() {
+  document.getElementById('graphContainer').classList.toggle('fullscreen');
+  setTimeout(renderGraph, 100);
+}
+
+/* ── Live hit demo ── */
+setTimeout(() => {
+  const div = document.createElement('div');
+  div.className = 'live-hit';
+  div.innerHTML = '<strong>GitHub</strong><br><a href="#" style="color:inherit">https://github.com/johndoe</a>';
+  document.body.appendChild(div);
+  setTimeout(() => div.remove(), 3500);
+}, 1500);
+setTimeout(() => {
+  const div = document.createElement('div');
+  div.className = 'live-hit';
+  div.innerHTML = '<strong>Twitter / X</strong><br><a href="#" style="color:inherit">https://x.com/johndoe</a>';
+  document.body.appendChild(div);
+  setTimeout(() => div.remove(), 3500);
+}, 3500);
+</script>
+</body>
+</html>

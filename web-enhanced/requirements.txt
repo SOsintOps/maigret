@@ -1,0 +1,4 @@
+fastapi>=0.115.0
+uvicorn>=0.34.0
+maigret>=0.6.0
+sse-starlette>=2.0.0
