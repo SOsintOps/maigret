@@ -89,37 +89,37 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| STAB-01 | — | Pending |
-| STAB-02 | — | Pending |
-| STAB-03 | — | Pending |
-| STAB-04 | — | Pending |
-| BACK-01 | — | Pending |
-| BACK-02 | — | Pending |
-| CSSF-01 | — | Pending |
-| CSSF-02 | — | Pending |
-| CSSF-03 | — | Pending |
-| LAYT-01 | — | Pending |
-| LAYT-02 | — | Pending |
-| LAYT-03 | — | Pending |
-| LAYT-04 | — | Pending |
-| LAYT-05 | — | Pending |
-| RESL-01 | — | Pending |
-| RESL-02 | — | Pending |
-| RESL-03 | — | Pending |
-| RESL-04 | — | Pending |
-| RESL-05 | — | Pending |
-| RESL-06 | — | Pending |
-| RESL-07 | — | Pending |
-| RESL-08 | — | Pending |
-| GRPH-01 | — | Pending |
-| GRPH-02 | — | Pending |
-| GRPH-03 | — | Pending |
+| STAB-01 | Phase 1 | Pending |
+| STAB-02 | Phase 1 | Pending |
+| STAB-03 | Phase 1 | Pending |
+| STAB-04 | Phase 1 | Pending |
+| BACK-01 | Phase 1 | Pending |
+| BACK-02 | Phase 1 | Pending |
+| CSSF-01 | Phase 2 | Pending |
+| CSSF-02 | Phase 2 | Pending |
+| CSSF-03 | Phase 2 | Pending |
+| LAYT-01 | Phase 3 | Pending |
+| LAYT-02 | Phase 3 | Pending |
+| LAYT-03 | Phase 3 | Pending |
+| LAYT-04 | Phase 3 | Pending |
+| LAYT-05 | Phase 3 | Pending |
+| RESL-01 | Phase 4 | Pending |
+| RESL-02 | Phase 4 | Pending |
+| RESL-03 | Phase 4 | Pending |
+| RESL-04 | Phase 4 | Pending |
+| RESL-05 | Phase 4 | Pending |
+| RESL-06 | Phase 4 | Pending |
+| RESL-07 | Phase 4 | Pending |
+| RESL-08 | Phase 4 | Pending |
+| GRPH-01 | Phase 5 | Pending |
+| GRPH-02 | Phase 5 | Pending |
+| GRPH-03 | Phase 5 | Pending |
 
 **Coverage:**
 - v1 requirements: 25 total
-- Mapped to phases: 0
-- Unmapped: 25
+- Mapped to phases: 25
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-05-07*
-*Last updated: 2026-05-07 after initial definition*
+*Last updated: 2026-05-07 after roadmap creation*
