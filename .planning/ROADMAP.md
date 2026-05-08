@@ -34,8 +34,8 @@ Decimal phases appear between their surrounding integers in numeric order.
 
 Plans:
 **Wave 1**
-- [ ] 01-01-PLAN.md — XSS URL sanitization and temp file cleanup in scanner.py
-- [ ] 01-02-PLAN.md — Update requirements.txt (pin FastAPI, remove sse-starlette)
+- [x] 01-01-PLAN.md — XSS URL sanitization and temp file cleanup in scanner.py
+- [x] 01-02-PLAN.md — Update requirements.txt (pin FastAPI, remove sse-starlette)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 01-03-PLAN.md — SSE migration to EventSourceResponse and asyncio task GC fix in server.py
