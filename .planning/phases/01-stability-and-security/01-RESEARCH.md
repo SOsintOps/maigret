@@ -538,17 +538,19 @@ maigret>=0.6.0
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **FastAPI 0.136.1 vs 0.135.1 — which to pin?**
    - What we know: 0.135.1 is the minimum required for `fastapi.sse`; 0.136.1 is the latest stable as of 2026-05-08.
    - What's unclear: Whether any breaking changes between 0.135.1 and 0.136.1 affect the existing routes.
    - Recommendation: Pin `>=0.135.1` (floor) rather than exact version, so future patch releases install automatically. The planner should choose this floor.
+   - RESOLVED: Plans pin `fastapi>=0.135.1` (floor) in requirements.txt per Plan 02.
 
 2. **`asyncio.TimeoutError` vs `TimeoutError` (Python 3.11+)**
    - What we know: Python 3.11 aliased `asyncio.TimeoutError` to the builtin `TimeoutError`. The project targets Python 3.10+.
    - What's unclear: The maigret venv Python version in this environment is 3.9.6 (system). Poetry requires 3.10+.
    - Recommendation: Use `asyncio.TimeoutError` to be safe on 3.10+. This is a one-line concern for the implementer.
+   - RESOLVED: Plans use `asyncio.TimeoutError` in the scan_progress event_stream generator (Plan 03).
 
 ---
 
@@ -587,12 +589,12 @@ maigret>=0.6.0
 
 | Req ID | Behavior | Test Type | Automated Command | File Exists? |
 |--------|----------|-----------|-------------------|-------------|
-| STAB-01 | SSE generator exits on client disconnect without leaving orphaned queue reader | unit + integration | `pytest web-enhanced/tests/test_server.py::test_sse_disconnect -x` | ❌ Wave 0 |
-| STAB-02 | `javascript:` URL in profile data is returned as empty string by get_found_profiles() | unit | `pytest web-enhanced/tests/test_scanner.py::test_safe_url_rejects_javascript -x` | ❌ Wave 0 |
-| STAB-03 | Task created in start_scan() exists in `_background_tasks` set until completion | unit | `pytest web-enhanced/tests/test_server.py::test_task_stored_in_set -x` | ❌ Wave 0 |
-| STAB-04 | Exception in save_pdf_report() does not leave tmp file on disk | unit | `pytest web-enhanced/tests/test_scanner.py::test_export_tmp_cleanup_on_exception -x` | ❌ Wave 0 |
-| BACK-01 | scan_progress endpoint returns EventSourceResponse not StreamingResponse | unit | `pytest web-enhanced/tests/test_server.py::test_progress_uses_event_source_response -x` | ❌ Wave 0 |
-| BACK-02 | requirements.txt does not contain sse-starlette | static | `grep -c sse-starlette web-enhanced/requirements.txt; test $? -ne 0` (or pytest file parse test) | ❌ Wave 0 |
+| STAB-01 | SSE generator exits on client disconnect without leaving orphaned queue reader | unit + integration | `pytest web-enhanced/tests/test_server.py::test_sse_disconnect_exits_generator_cleanly -x` | Created in Plan 03 |
+| STAB-02 | `javascript:` URL in profile data is returned as empty string by get_found_profiles() | unit | `pytest web-enhanced/tests/test_scanner.py::test_safe_url_rejects_javascript -x` | Created in Plan 01 |
+| STAB-03 | Task created in start_scan() exists in `_background_tasks` set until completion | unit | `pytest web-enhanced/tests/test_server.py::test_task_stored_in_set -x` | Created in Plan 03 |
+| STAB-04 | Exception in save_pdf_report() does not leave tmp file on disk | unit | `pytest web-enhanced/tests/test_scanner.py::test_export_pdf_tmp_cleanup_on_exception -x` | Created in Plan 01 |
+| BACK-01 | scan_progress endpoint returns EventSourceResponse not StreamingResponse | unit | `pytest web-enhanced/tests/test_server.py::test_event_source_response_import -x` | Created in Plan 03 |
+| BACK-02 | requirements.txt does not contain sse-starlette | static | `grep -c sse-starlette web-enhanced/requirements.txt; test $? -ne 0` (or pytest file parse test) | Verified in Plan 02 |
 
 ### Sampling Rate
 - **Per task commit:** `pytest web-enhanced/tests/ -x -q`
