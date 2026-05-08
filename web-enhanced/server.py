@@ -3,11 +3,12 @@
 import asyncio
 import uuid
 from contextlib import asynccontextmanager
+from typing import List, Optional
 
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, Response, StreamingResponse
-# No fastapi.sse — use StreamingResponse for SSE (Starlette 0.49.3 handles disconnect via GeneratorExit)
+# No fastapi.sse — use StreamingResponse for SSE (Starlette 0.49.3 cancels the generator on disconnect)
 from pydantic import BaseModel
 
 import json
@@ -34,8 +35,8 @@ class ScanRequest(BaseModel):
     username: str
     top_sites: int = 500
     timeout: int = 30
-    tags: list[str] | None = None
-    excluded_tags: list[str] | None = None
+    tags: Optional[List[str]] = None
+    excluded_tags: Optional[List[str]] = None
     recursive: bool = False
 
     def model_post_init(self, __context):
