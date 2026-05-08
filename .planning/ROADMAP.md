@@ -41,7 +41,7 @@ Plans:
 - [x] 01-03-PLAN.md — SSE migration to EventSourceResponse and asyncio task GC fix in server.py
 
 **Wave 3** *(gap closure — blocked on Wave 2 completion)*
-- [ ] 01-04-PLAN.md — Fix fastapi.sse blocker: revert SSE to StreamingResponse, add behavioral disconnect tests
+- [x] 01-04-PLAN.md — Fix fastapi.sse blocker: revert SSE to StreamingResponse, add behavioral disconnect tests
 
 **Wave 3 — Gap Closure** *(fixes verification blocker from 01-03)*
 - [ ] 01-04-PLAN.md — Fix fastapi.sse import blocker: revert to StreamingResponse SSE, update requirements.txt pin, add behavioral disconnect tests
