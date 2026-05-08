@@ -33,8 +33,11 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans:** 3 plans
 
 Plans:
+**Wave 1**
 - [ ] 01-01-PLAN.md — XSS URL sanitization and temp file cleanup in scanner.py
 - [ ] 01-02-PLAN.md — Update requirements.txt (pin FastAPI, remove sse-starlette)
+
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 01-03-PLAN.md — SSE migration to EventSourceResponse and asyncio task GC fix in server.py
 
 ### Phase 2: CSS Architecture
