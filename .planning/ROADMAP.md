@@ -38,7 +38,7 @@ Plans:
 - [x] 01-02-PLAN.md — Update requirements.txt (pin FastAPI, remove sse-starlette)
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 01-03-PLAN.md — SSE migration to EventSourceResponse and asyncio task GC fix in server.py
+- [x] 01-03-PLAN.md — SSE migration to EventSourceResponse and asyncio task GC fix in server.py
 
 ### Phase 2: CSS Architecture
 **Goal**: The stylesheet is structured with named @layer blocks and verified design tokens before any new visual rules are written
