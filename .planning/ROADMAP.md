@@ -44,7 +44,7 @@ Plans:
 - [x] 01-04-PLAN.md — Fix fastapi.sse blocker: revert SSE to StreamingResponse, add behavioral disconnect tests
 
 **Wave 3 — Gap Closure** *(fixes verification blocker from 01-03)*
-- [ ] 01-04-PLAN.md — Fix fastapi.sse import blocker: revert to StreamingResponse SSE, update requirements.txt pin, add behavioral disconnect tests
+- [x] 01-04-PLAN.md — Fix fastapi.sse import blocker: revert to StreamingResponse SSE, update requirements.txt pin, add behavioral disconnect tests
 
 ### Phase 2: CSS Architecture
 **Goal**: The stylesheet is structured with named @layer blocks and verified design tokens before any new visual rules are written
