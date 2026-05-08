@@ -30,7 +30,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. An asyncio scan task running in the background survives garbage collection until the scan completes
   4. Cancelling or crashing a scan does not leave temporary export files on disk
   5. The SSE endpoint uses FastAPI native EventSourceResponse; sse-starlette is removed from requirements.txt
-**Plans:** 3 plans
+**Plans:** 4 plans
 
 Plans:
 **Wave 1**
@@ -39,6 +39,9 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [x] 01-03-PLAN.md — SSE migration to EventSourceResponse and asyncio task GC fix in server.py
+
+**Wave 3 — Gap Closure** *(fixes verification blocker from 01-03)*
+- [ ] 01-04-PLAN.md — Fix fastapi.sse import blocker: revert to StreamingResponse SSE, update requirements.txt pin, add behavioral disconnect tests
 
 ### Phase 2: CSS Architecture
 **Goal**: The stylesheet is structured with named @layer blocks and verified design tokens before any new visual rules are written
@@ -95,7 +98,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Stability and Security | 0/3 | Planning complete | - |
+| 1. Stability and Security | 3/4 | Gap closure planned | - |
 | 2. CSS Architecture | 0/TBD | Not started | - |
 | 3. Layout and Search Panel | 0/TBD | Not started | - |
 | 4. Results Components | 0/TBD | Not started | - |
