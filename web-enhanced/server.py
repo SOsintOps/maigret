@@ -6,7 +6,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, Response, StreamingResponse
+from fastapi.responses import FileResponse, Response
+from fastapi.sse import EventSourceResponse, ServerSentEvent
 from pydantic import BaseModel
 
 import json
@@ -16,6 +17,7 @@ from scanner import ScanJob, run_scan, get_db, get_all_tags, get_found_profiles,
 
 # In-memory job store
 jobs: dict[str, ScanJob] = {}
+_background_tasks: set[asyncio.Task] = set()
 
 
 @asynccontextmanager
@@ -55,7 +57,7 @@ async def start_scan(req: ScanRequest):
     job = ScanJob(id=job_id, username=req.username)
     jobs[job_id] = job
 
-    asyncio.create_task(run_scan(
+    task = asyncio.create_task(run_scan(
         job,
         top_sites=req.top_sites,
         timeout=req.timeout,
@@ -63,12 +65,14 @@ async def start_scan(req: ScanRequest):
         excluded_tags=req.excluded_tags,
         recursive=req.recursive,
     ))
+    _background_tasks.add(task)
+    task.add_done_callback(_background_tasks.discard)
 
     return {"id": job_id, "username": req.username, "status": "started"}
 
 
 @app.get("/api/scan/{job_id}/progress")
-async def scan_progress(job_id: str):
+async def scan_progress(job_id: str) -> EventSourceResponse:
     job = jobs.get(job_id)
     if not job:
         raise HTTPException(404, "Job not found")
@@ -78,22 +82,18 @@ async def scan_progress(job_id: str):
             try:
                 event = await asyncio.wait_for(job.queue.get(), timeout=60)
             except asyncio.TimeoutError:
-                yield ": keepalive\n\n"
-                continue
+                continue  # EventSourceResponse sends its own keep-alive ping every 15s
 
-            if event.get("type") == "done":
-                yield f"data: {json.dumps({'type': 'done', 'found': job.progress.found})}\n\n"
-                break
-            elif event.get("type") == "error":
-                yield f"data: {json.dumps({'type': 'error', 'message': event.get('message', 'Unknown error')})}\n\n"
+            if event.get("type") in ("done", "error"):
+                yield ServerSentEvent(data=json.dumps(event), event=event["type"])
                 break
             else:
                 job.progress.completed = event["completed"]
                 job.progress.total = event["total"]
                 job.progress.found = event["found"]
-                yield f"data: {json.dumps(event)}\n\n"
+                yield ServerSentEvent(data=json.dumps(event))
 
-    return StreamingResponse(event_stream(), media_type="text/event-stream")
+    return EventSourceResponse(event_stream())
 
 
 @app.get("/api/scan/{job_id}/results")
