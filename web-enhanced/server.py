@@ -6,8 +6,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse, Response
-from fastapi.sse import EventSourceResponse, ServerSentEvent
+from fastapi.responses import FileResponse, Response, StreamingResponse
+# No fastapi.sse — use StreamingResponse for SSE (Starlette 0.49.3 handles disconnect via GeneratorExit)
 from pydantic import BaseModel
 
 import json
@@ -72,7 +72,7 @@ async def start_scan(req: ScanRequest):
 
 
 @app.get("/api/scan/{job_id}/progress")
-async def scan_progress(job_id: str) -> EventSourceResponse:
+async def scan_progress(job_id: str):
     job = jobs.get(job_id)
     if not job:
         raise HTTPException(404, "Job not found")
@@ -82,18 +82,19 @@ async def scan_progress(job_id: str) -> EventSourceResponse:
             try:
                 event = await asyncio.wait_for(job.queue.get(), timeout=60)
             except asyncio.TimeoutError:
-                continue  # EventSourceResponse sends its own keep-alive ping every 15s
+                yield ":\n\n"  # SSE comment line as keep-alive ping
+                continue
 
             if event.get("type") in ("done", "error"):
-                yield ServerSentEvent(data=json.dumps(event), event=event["type"])
+                yield f"event: {event['type']}\ndata: {json.dumps(event)}\n\n"
                 break
             else:
                 job.progress.completed = event["completed"]
                 job.progress.total = event["total"]
                 job.progress.found = event["found"]
-                yield ServerSentEvent(data=json.dumps(event))
+                yield f"data: {json.dumps(event)}\n\n"
 
-    return EventSourceResponse(event_stream())
+    return StreamingResponse(event_stream(), media_type="text/event-stream")
 
 
 @app.get("/api/scan/{job_id}/results")
