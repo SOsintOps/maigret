@@ -39,7 +39,7 @@ An OSINT analyst can scan usernames across thousands of sites through a browser,
 - [ ] Notes textarea styling matching mockup
 - [ ] Live hit toast position and animation matching mockup
 - [ ] Search panel advanced options (tag clouds, checkboxes) matching mockup
-- [ ] Stability and error handling for all scan states
+- ✓ Stability and error handling for all scan states — Validated in Phase 1: Stability and Security
 
 ### Out of Scope
 
@@ -100,4 +100,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-06 after initialisation*
+*Last updated: 2026-05-08 after Phase 1 completion*
