@@ -55,6 +55,29 @@ Exceptions:
 
 **Source:** Extracted from style.css lines 37–537 (direct codebase read). RESEARCH.md Pattern 4.
 
+### Spacing Scale Exception
+
+**EXCEPTION: Non-standard spacing values are intentional and required.**
+
+The standard 8-point spacing grid ({4, 8, 16, 24, 32, 48, 64}px) is the conventional
+default for new UI work. This phase departs from that convention for the following
+documented reason:
+
+- **Values 6px, 12px, and 20px** are NOT design choices invented for this phase.
+  They are verbatim extracted values from the existing `style.css` (written before
+  this phase began). Replacing them with nearest standard-grid equivalents (8px, 16px,
+  16px or 24px) would produce measurable pixel drift against the current rendered UI,
+  directly violating the phase's zero-visual-drift goal (CONTEXT.md D-04, REQUIREMENTS.md
+  success criterion "no visible difference before and after").
+
+- **Tradeoff accepted:** Non-standard spacing values are preserved in exchange for
+  exact visual parity. Future phases that introduce new spacing (Phase 3+) MUST use
+  the standard 8-point scale for any new values added. This exception applies only to
+  the 8 extracted tokens documented in the table above.
+
+- **These are extracted values, not invented values.** The executor must not "fix"
+  them to standard-grid equivalents.
+
 ---
 
 ## Typography
@@ -86,6 +109,35 @@ required; this is a single-use stack for the `.raw-json` component.
 
 **Source:** Extracted from style.css. REQUIREMENTS.md CSSF-02 (Inter weights 400/500/600/700).
 RESEARCH.md Pattern 4.
+
+### Typography Scale Exception
+
+**EXCEPTION: 8 font sizes and 4 font weights are intentional and required.**
+
+The standard design contract limit of 3–4 font sizes and 2 font weights exists to
+prevent new UI work from becoming visually inconsistent. This phase departs from those
+limits for the following documented reason:
+
+- **8 font sizes (10px–28px)** are NOT design choices invented for this phase. They
+  are verbatim extracted values from the existing `style.css`. The existing UI already
+  uses all 8 sizes across distinct components (tag-chip label at 11px, badge at 10px,
+  body at 14px, etc.). Consolidating to 4 sizes would require visually changing those
+  components, which directly violates the phase's zero-visual-drift goal (CONTEXT.md
+  D-04, REQUIREMENTS.md success criterion "no visible difference before and after").
+
+- **4 font weights (400/500/600/700)** are explicitly required by REQUIREMENTS.md
+  CSSF-02: "Inter font is self-hosted as WOFF2 (Latin subset, weights 400, 500, 600,
+  700)." These weights are loaded from Google Fonts today and must be replaced with
+  the same 4 weights in self-hosted form. Reducing to 2 weights would leave font
+  weight tokens undefined and break the self-hosting requirement.
+
+- **Tradeoff accepted:** Pre-existing typographic complexity is preserved in exchange
+  for exact visual parity and requirement compliance. Future phases that introduce new
+  type roles (Phase 3+) MUST use sizes from the already-declared scale and MUST NOT
+  add new weight tokens.
+
+- **These are extracted values, not invented values.** The executor must not merge or
+  eliminate any of the 8 size roles or 4 weight tokens.
 
 ---
 
@@ -241,7 +293,7 @@ Use server-root-relative paths:
 ```css
 src: url('/static/fonts/inter-regular.woff2') format('woff2');
 ```
-Rationale: mockup.html loads style.css via both `<link>` and `@import` — absolute
+Rationale: mockup.html loads style.css via both `<link>` and `@import` in inline `<style>` — absolute
 paths prevent 404 if either load origin differs. See RESEARCH.md Pitfall 2.
 
 ### Google Fonts Tag Removal
@@ -284,11 +336,11 @@ Visual regression is the primary risk. The following checks define phase accepta
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS (no new copy; existing copy unchanged)
-- [ ] Dimension 2 Visuals: PASS (zero visual change required — parity is the spec)
-- [ ] Dimension 3 Color: PASS (60/30/10 contract documented; no values changed)
-- [ ] Dimension 4 Typography: PASS (8 size roles declared; 4 weight tokens declared)
-- [ ] Dimension 5 Spacing: PASS (8 spacing tokens declared from extracted values)
-- [ ] Dimension 6 Registry Safety: PASS (no registry; vanilla CSS)
+- [ ] Dimension 1 Copywriting: pending checker review (no new copy; existing copy unchanged)
+- [ ] Dimension 2 Visuals: pending checker review (zero visual change required — parity is the spec)
+- [ ] Dimension 3 Color: pending checker review (60/30/10 contract documented; no values changed)
+- [ ] Dimension 4 Typography: pending checker review — SEE EXCEPTION above (8 sizes / 4 weights extracted from codebase; standard limits do not apply; visual parity requirement overrides)
+- [ ] Dimension 5 Spacing: pending checker review — SEE EXCEPTION above (6px/12px/20px extracted from codebase; standard 8pt grid does not apply; visual parity requirement overrides)
+- [ ] Dimension 6 Registry Safety: pending checker review (no registry; vanilla CSS)
 
 **Approval:** pending
