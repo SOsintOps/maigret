@@ -54,8 +54,14 @@ Plans:
   1. style.css opens with a single @layer declaration listing all six named layers in order
   2. The Inter font loads from a local WOFF2 file with no Google Fonts network request
   3. Every colour, spacing, radius, and typography value in the stylesheet matches the corresponding value in mockup.html
-**Plans**: TBD
-**UI hint**: yes
+**Plans:** 2 plans
+
+Plans:
+**Wave 1**
+- [ ] 02-01-PLAN.md — Download Inter WOFF2 fonts and remove Google Fonts CDN links from HTML files
+
+**Wave 2** *(blocked on Wave 1 completion)*
+- [ ] 02-02-PLAN.md — Restructure style.css with @layer blocks, @font-face, expanded design tokens, and full rule migration
 
 ### Phase 3: Layout and Search Panel
 **Goal**: The header, progress bar, target tabs, and search panel modal match the mockup layout exactly
@@ -102,7 +108,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Stability and Security | 3/4 | Gap closure planned | - |
-| 2. CSS Architecture | 0/TBD | Not started | - |
+| 2. CSS Architecture | 0/2 | Planned | - |
 | 3. Layout and Search Panel | 0/TBD | Not started | - |
 | 4. Results Components | 0/TBD | Not started | - |
 | 5. Graph Polish | 0/TBD | Not started | - |
