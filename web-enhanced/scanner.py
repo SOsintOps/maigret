@@ -7,6 +7,7 @@ import io
 import os
 from dataclasses import dataclass, field
 from typing import Optional
+from urllib.parse import urlparse
 
 from maigret.sites import MaigretDatabase
 from maigret.notify import QueryNotify
@@ -165,6 +166,14 @@ async def run_scan(
         await job.queue.put({"type": "done"})
 
 
+def _safe_url(url: str) -> str:
+    """Allow only http and https URLs; return empty string for anything else."""
+    if not url:
+        return ""
+    scheme = urlparse(url).scheme.lower()
+    return url if scheme in ("http", "https") else ""
+
+
 def get_found_profiles(results: dict) -> list[dict]:
     """Extract claimed profiles from results."""
     profiles = []
@@ -173,7 +182,7 @@ def get_found_profiles(results: dict) -> list[dict]:
         if status and status.status == MaigretCheckStatus.CLAIMED:
             profiles.append({
                 "site": site_name,
-                "url": status.site_url_user,
+                "url": _safe_url(status.site_url_user),
                 "tags": list(status.tags) if status.tags else [],
                 "response_time": round(status.query_time, 2) if status.query_time else None,
                 "http_status": data.get("http_status"),
@@ -237,23 +246,31 @@ def generate_export(job: ScanJob, fmt: str) -> tuple[bytes, str, str]:
     elif fmt == "pdf":
         import tempfile
         context = report.generate_report_context(job.general_results)
-        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as f:
-            tmp_path = f.name
-        report.save_pdf_report(tmp_path, context)
-        with open(tmp_path, "rb") as f:
-            content = f.read()
-        os.unlink(tmp_path)
+        tmp_path = None
+        try:
+            with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as f:
+                tmp_path = f.name
+            report.save_pdf_report(tmp_path, context)
+            with open(tmp_path, "rb") as f:
+                content = f.read()
+        finally:
+            if tmp_path and os.path.exists(tmp_path):
+                os.unlink(tmp_path)
         return content, "application/pdf", f"{username}-maigret.pdf"
 
     elif fmt == "html":
         import tempfile
         context = report.generate_report_context(job.general_results)
-        with tempfile.NamedTemporaryFile(suffix=".html", delete=False, mode="w") as f:
-            tmp_path = f.name
-        report.save_html_report(tmp_path, context)
-        with open(tmp_path, "r") as f:
-            content = f.read().encode()
-        os.unlink(tmp_path)
+        tmp_path = None
+        try:
+            with tempfile.NamedTemporaryFile(suffix=".html", delete=False, mode="w") as f:
+                tmp_path = f.name
+            report.save_html_report(tmp_path, context)
+            with open(tmp_path, "r") as f:
+                content = f.read().encode()
+        finally:
+            if tmp_path and os.path.exists(tmp_path):
+                os.unlink(tmp_path)
         return content, "text/html", f"{username}-maigret.html"
 
     else:
