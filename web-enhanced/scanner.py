@@ -1,4 +1,5 @@
 """Maigret wrapper with real-time progress tracking via asyncio Queue."""
+from __future__ import annotations
 
 import asyncio
 import time
