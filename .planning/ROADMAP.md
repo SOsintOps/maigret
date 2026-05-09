@@ -61,7 +61,7 @@ Plans:
 - [x] 02-01-PLAN.md — Download Inter WOFF2 fonts and remove Google Fonts CDN links from HTML files
 
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 02-02-PLAN.md — Restructure style.css with @layer blocks, @font-face, expanded design tokens, and full rule migration
+- [x] 02-02-PLAN.md — Restructure style.css with @layer blocks, @font-face, expanded design tokens, and full rule migration
 
 ### Phase 3: Layout and Search Panel
 **Goal**: The header, progress bar, target tabs, and search panel modal match the mockup layout exactly
