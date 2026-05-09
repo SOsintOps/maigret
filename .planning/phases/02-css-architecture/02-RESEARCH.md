@@ -413,17 +413,17 @@ curl -L -o web-enhanced/static/fonts/inter-bold.woff2 \
 
 **A2 clarification (important):** MDN notes that `@keyframes` inside a `@layer` block behave differently across browsers in early implementations. The safe approach is to place `@keyframes` **outside** all `@layer` blocks at the bottom of the file, or in an anonymous unlayered block, to ensure universal accessibility. The planner should account for this and place `@keyframes fadeInUp` and `@keyframes fadeOut` outside any layer.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **@keyframes inside vs outside @layer**
+1. **RESOLVED: @keyframes inside vs outside @layer**
    - What we know: The spec says @keyframes inside a layer should be scoped to that layer. MDN warns browser implementation consistency is imperfect.
    - What's unclear: Whether Chrome/Firefox/Safari all correctly allow cross-layer keyframe references.
-   - Recommendation: Place `@keyframes` outside all `@layer` blocks (unlayered) to guarantee animation works across all browsers. Since only 2 keyframe blocks exist in the project, this is a minimal footprint.
+   - Resolution: Place `@keyframes` outside all `@layer` blocks (unlayered) to guarantee animation works across all browsers. Since only 2 keyframe blocks exist in the project, this is a minimal footprint. **Implemented in Plan 02-02 Task 1.**
 
-2. **mockup.html dual CSS import visual fidelity**
+2. **RESOLVED: mockup.html dual CSS import visual fidelity**
    - What we know: mockup.html loads style.css via `<link>` AND via `@import` in an inline `<style>`. This was true before Phase 2.
    - What's unclear: Whether the layered CSS correctly handles the de-duplication when the same file is imported twice.
-   - Recommendation: Both imports produce identical layer declarations from the same file; browsers deduplicate by source. Verify post-migration by opening mockup.html and checking the Network panel shows only one style.css parse (not two conflicting ones). No action needed unless a visual anomaly appears.
+   - Resolution: Both imports produce identical layer declarations from the same file; browsers deduplicate by source. Verify post-migration by opening mockup.html and checking the Network panel shows only one style.css parse (not two conflicting ones). No action needed unless a visual anomaly appears. **Verified by Plan 02-02 Task 2 visual checkpoint.**
 
 ## Environment Availability
 
