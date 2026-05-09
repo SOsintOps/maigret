@@ -58,7 +58,7 @@ Plans:
 
 Plans:
 **Wave 1**
-- [ ] 02-01-PLAN.md — Download Inter WOFF2 fonts and remove Google Fonts CDN links from HTML files
+- [x] 02-01-PLAN.md — Download Inter WOFF2 fonts and remove Google Fonts CDN links from HTML files
 
 **Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 02-02-PLAN.md — Restructure style.css with @layer blocks, @font-face, expanded design tokens, and full rule migration
